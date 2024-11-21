@@ -40,3 +40,13 @@ if (my @row = $sth->fetchrow_array) {
 } else {
     print "<p>No se encontró ningún actor con ID 5.</p>";
 }
+# Ejercicio 3: Mostrar tabla de actores con ID >= 8
+print "<h2>Ejercicio 3: Actores con ID >= 8</h2>";
+$sth = $dbh->prepare("SELECT actor_id, nombre FROM actores WHERE actor_id >= 8");
+$sth->execute();
+print "<table border='1'>";
+print "<tr><th>ID</th><th>Nombre</th></tr>";
+while (my @row = $sth->fetchrow_array) {
+    print "<tr><td>$row[0]</td><td>$row[1]</td></tr>";
+}
+print "</table>";
