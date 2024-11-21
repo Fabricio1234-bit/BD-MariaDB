@@ -24,13 +24,19 @@ CREATE TABLE IF NOT EXISTS `actores` (
   `actor_id` int(11) NOT NULL AUTO_INCREMENT,
   `nombre` varchar(100) NOT NULL,
   PRIMARY KEY (`actor_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
--- Volcando datos para la tabla actores.actores: ~3 rows (aproximadamente)
+-- Volcando datos para la tabla actores.actores: ~9 rows (aproximadamente)
 INSERT INTO `actores` (`actor_id`, `nombre`) VALUES
 	(1, 'Robert Downey Jr.'),
 	(2, 'Scarlett Johansson'),
-	(3, 'Chris Hemsworth');
+	(3, 'Chris Hemsworth'),
+	(5, 'Nicolas Cage'),
+	(6, 'Rita Hayworth'),
+	(7, 'Michael Keaton'),
+	(8, 'Demi Moore'),
+	(9, 'Morgan Freeman'),
+	(10, 'Samuel L. Jackson');
 
 -- Volcando estructura para tabla actores.casting
 CREATE TABLE IF NOT EXISTS `casting` (
@@ -45,7 +51,7 @@ CREATE TABLE IF NOT EXISTS `casting` (
   CONSTRAINT `casting_ibfk_2` FOREIGN KEY (`actor_id`) REFERENCES `actores` (`actor_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
--- Volcando datos para la tabla actores.casting: ~6 rows (aproximadamente)
+-- Volcando datos para la tabla actores.casting: ~5 rows (aproximadamente)
 INSERT INTO `casting` (`casting_id`, `pelicula_id`, `actor_id`, `papel`) VALUES
 	(1, 1, 1, 'Iron Man'),
 	(2, 1, 2, 'Black Widow'),
@@ -57,17 +63,21 @@ INSERT INTO `casting` (`casting_id`, `pelicula_id`, `actor_id`, `papel`) VALUES
 CREATE TABLE IF NOT EXISTS `peliculas` (
   `pelicula_id` int(11) NOT NULL AUTO_INCREMENT,
   `nombre` varchar(100) NOT NULL,
-  `año` int(11) DEFAULT NULL,
+  `year` int(11) DEFAULT NULL,
   `vote` int(11) DEFAULT NULL,
   `score` decimal(3,1) DEFAULT NULL,
   PRIMARY KEY (`pelicula_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
--- Volcando datos para la tabla actores.peliculas: ~3 rows (aproximadamente)
-INSERT INTO `peliculas` (`pelicula_id`, `nombre`, `año`, `vote`, `score`) VALUES
+-- Volcando datos para la tabla actores.peliculas: ~7 rows (aproximadamente)
+INSERT INTO `peliculas` (`pelicula_id`, `nombre`, `year`, `vote`, `score`) VALUES
 	(1, 'Avengers: Endgame', 2019, 8500, 8.4),
 	(2, 'Iron Man', 2008, 8000, 7.9),
-	(3, 'Thor', 2011, 3200, 7.0);
+	(3, 'Thor', 2011, 3200, 7.0),
+	(4, 'Inception', 2010, 20000, 8.8),
+	(5, 'Django', 2018, 8000, 9.0),
+	(6, 'El dictador', 2012, 6000, 6.5),
+	(7, 'Sin rastros', 2008, 5500, 7.5);
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
