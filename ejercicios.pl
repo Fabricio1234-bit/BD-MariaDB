@@ -6,8 +6,8 @@ use DBI;
 
 # Configuración de la base de datos
 my $dsn = "DBI:mysql:database=actores;host=localhost";
-my $username = "tu_usuario";
-my $password = "tu_contraseña";
+my $username = "root";
+my $password = "paredes48621234";
 
 # Conexión a la base de datos
 my $dbh = DBI->connect($dsn, $username, $password, { RaiseError => 1 }) or die "No se puede conectar a la base de datos: $DBI::errstr";
@@ -60,3 +60,36 @@ while (my @row = $sth->fetchrow_array) {
     print "<tr><td>$row[0]</td><td>$row[1]</td><td>$row[2]</td><td>$row[3]</td><td>$row[4]</td></tr>";
 }
 print "</table>";
+# Ejercicio 5: Mostrar formulario y resultados
+print "<h2>Ejercicio 5: Películas por año</h2>";
+print $cgi->start_form(-method => 'GET', -action => '/cgi-bin/multi_task.cgi');
+print "<label for='year'>Ingrese un año:</label>";
+print "<input type='number' id='year' name='year' required>";
+print "<button type='submit'>Consultar</button>";
+print $cgi->end_form;
+
+if ($year) {
+    print "<h3>Películas del año $year</h3>";
+    $sth = $dbh->prepare(
+        "SELECT peliculas.nombre, actores.nombre 
+         FROM peliculas
+         JOIN casting ON peliculas.pelicula_id = casting.pelicula_id
+         JOIN actores ON casting.actor_id = actores.actor_id
+         WHERE peliculas.year = ?"
+    );
+    $sth->execute($year);
+    print "<table border='1'>";
+    print "<tr><th>Película</th><th>Actor</th></tr>";
+    while (my @row = $sth->fetchrow_array) {
+        print "<tr><td>$row[0]</td><td>$row[1]</td></tr>";
+    }
+    print "</table>";
+}
+
+# Cerrar conexión a la base de datos
+$sth->finish();
+$dbh->disconnect();
+
+# Cerrar HTML
+print "</body>";
+print "</html>";
