@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS `actores` (
   `actor_id` int(11) NOT NULL AUTO_INCREMENT,
   `nombre` varchar(100) NOT NULL,
   PRIMARY KEY (`actor_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 -- Volcando datos para la tabla actores.actores: ~3 rows (aproximadamente)
 INSERT INTO `actores` (`actor_id`, `nombre`) VALUES
@@ -43,15 +43,15 @@ CREATE TABLE IF NOT EXISTS `casting` (
   KEY `actor_id` (`actor_id`),
   CONSTRAINT `casting_ibfk_1` FOREIGN KEY (`pelicula_id`) REFERENCES `peliculas` (`pelicula_id`) ON DELETE CASCADE,
   CONSTRAINT `casting_ibfk_2` FOREIGN KEY (`actor_id`) REFERENCES `actores` (`actor_id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
--- Volcando datos para la tabla actores.casting: ~5 rows (aproximadamente)
+-- Volcando datos para la tabla actores.casting: ~6 rows (aproximadamente)
 INSERT INTO `casting` (`casting_id`, `pelicula_id`, `actor_id`, `papel`) VALUES
 	(1, 1, 1, 'Iron Man'),
 	(2, 1, 2, 'Black Widow'),
 	(3, 1, 3, 'Thor'),
 	(4, 2, 1, 'Iron Man'),
-	(5, 3, 3, 'Thor');
+	(6, 2, 2, 'Black Widow');
 
 -- Volcando estructura para tabla actores.peliculas
 CREATE TABLE IF NOT EXISTS `peliculas` (
