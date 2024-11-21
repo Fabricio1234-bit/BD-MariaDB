@@ -5,7 +5,7 @@ use CGI;
 use DBI;
 
 # Configuración de la base de datos
-my $dsn = "DBI:mysql:database=prueba;host=localhost";
+my $dsn = "DBI:mysql:database=actores;host=localhost";
 my $username = "tu_usuario";
 my $password = "tu_contraseña";
 
@@ -48,5 +48,15 @@ print "<table border='1'>";
 print "<tr><th>ID</th><th>Nombre</th></tr>";
 while (my @row = $sth->fetchrow_array) {
     print "<tr><td>$row[0]</td><td>$row[1]</td></tr>";
+}
+print "</table>";
+# Ejercicio 4: Mostrar tabla de películas con puntaje > 7 y más de 5000 votos
+print "<h2>Ejercicio 4: Películas con puntaje > 7 y más de 5000 votos</h2>";
+$sth = $dbh->prepare("SELECT pelicula_id, nombre, year, vote, score FROM peliculas WHERE score > 7 AND vote > 5000");
+$sth->execute();
+print "<table border='1'>";
+print "<tr><th>ID</th><th>Nombre</th><th>Año</th><th>Votos</th><th>Puntaje</th></tr>";
+while (my @row = $sth->fetchrow_array) {
+    print "<tr><td>$row[0]</td><td>$row[1]</td><td>$row[2]</td><td>$row[3]</td><td>$row[4]</td></tr>";
 }
 print "</table>";
