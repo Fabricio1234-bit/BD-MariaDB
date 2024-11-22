@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use DBI;
 
-my $dsn = "DBI:mysql:database=actores;host=localhost";
+my $dsn = "DBI:mysql:database=actores;host=localhost;port=3306";
 my $username = "root";
 my $password = "paredes48621234";
 
@@ -12,10 +12,13 @@ my $dbh = DBI->connect($dsn, $username, $password, { RaiseError => 1 }) or die "
 my $sth = $dbh->prepare("SELECT nombre FROM actores WHERE actor_id = 5");
 $sth->execute();
 
+
 print "Content-type: text/html\n\n";
+print "<table border='1'><tr><th>ID</th><th>Nombre</th></tr>";
 while (my @row = $sth->fetchrow_array) {
-    print "<p>Actor con ID 5: $row[0]</p>\n";
+    print "<tr><td>$row[0]</td><td>$row[1]</td></tr>\n";
 }
+print "</table>";
 
 $sth->finish();
 $dbh->disconnect();
