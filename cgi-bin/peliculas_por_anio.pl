@@ -9,7 +9,7 @@ my $year = $cgi->param('year');
 
 print $cgi->header('text/html');
 
-my $dsn = "DBI:mysql:database=actores;host=localhost;port=3306";
+my $dsn = "DBI:mysql:database=actores;host=127.0.0.1;port=3306";
 my $username = "root";
 my $password = "paredes48621234";
 
