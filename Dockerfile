@@ -1,41 +1,32 @@
-# Usa una imagen base de Debian para instalar Apache, Perl y MariaDB
-FROM debian:latest
-# Instala Apache, Perl, MariaDB y módulos necesarios
-RUN apt-get update && \
-    apt-get install -y apache2 libapache2-mod-perl2 perl mariadb-server \
-    libdbi-perl libdbd-mysql-perl && \
-    apt-get clean
+# Usar una imagen base de Perl con Apache preinstalado
+FROM perl:5.32-apache
 
-# Habilita el módulo CGI de Apache
+# Establecer el directorio de trabajo
+WORKDIR /var/www/html
+
+# Instalar módulos adicionales de Perl (si son necesarios)
+RUN cpan install DBI DBD::mysql CGI
+
+# Copiar los scripts CGI al directorio /usr/lib/cgi-bin
+COPY cgi-bin /usr/lib/cgi-bin/
+
+# Asegurar permisos de ejecución para los scripts CGI
+RUN chmod +x /usr/lib/cgi-bin/*.pl
+
+# Copiar los archivos HTML y CSS al directorio raíz del servidor
+COPY index.html /var/www/html/
+COPY styles.css /var/www/html/
+
+# Configurar Apache para habilitar CGI
 RUN a2enmod cgi
 
-# Crea el directorio CGI y da permisos
-RUN mkdir -p /usr/lib/cgi-bin
-RUN chmod +x /usr/lib/cgi-bin
-
-# Copia el script Perl en el directorio CGI
-COPY basedatos.pl /usr/lib/cgi-bin/basedatos.pl
-RUN chmod +x /usr/lib/cgi-bin/basedatos.pl
-
-# Copia el archivo de configuración de Apache
-COPY 000-default.conf /etc/apache2/sites-available/000-default.conf
-
-# Configura MariaDB
-RUN service mysql start && \
-    mysql -u root -e "CREATE DATABASE prueba;" && \
-    mysql -u root -e "USE prueba; \
-        CREATE TABLE actores (actor_id INT PRIMARY KEY AUTO_INCREMENT, nombre VARCHAR(100)); \
-        CREATE TABLE peliculas (pelicula_id INT PRIMARY KEY AUTO_INCREMENT, nombre VARCHAR(100), year INT, vote INT, score DECIMAL(3,1)); \
-        CREATE TABLE casting (casting_id INT PRIMARY KEY AUTO_INCREMENT, pelicula_id INT, actor_id INT, papel VARCHAR(100), \
-            FOREIGN KEY (pelicula_id) REFERENCES peliculas(pelicula_id) ON DELETE CASCADE, \
-            FOREIGN KEY (actor_id) REFERENCES actores(actor_id) ON DELETE CASCADE);" && \
-    mysql -u root -e "USE prueba; \
-        INSERT INTO actores (nombre) VALUES ('Robert Downey Jr.'), ('Scarlett Johansson'), ('Chris Hemsworth'); \
-  INSERT INTO peliculas (nombre, año, vote, score) VALUES ('Avengers: Endgame', 2019, 8500, 8.4), ('Iron Man', 2008, 4000, 7.9), ('Thor', 2011, 3200, 7.0); \
-INSERT INTO casting (pelicula_id, actor_id, papel) VALUES (1, 1, 'Iron Man'), (1, 2, 'Black Widow'), (1, 3, 'Thor'), (2, 1, 'Iron Man'), (3, 3, 'Thor');"
+# Configurar Apache para ejecutar scripts CGI desde /cgi-bin/
+RUN echo "ScriptAlias /cgi-bin/ /usr/lib/cgi-bin/" > /etc/apache2/conf-available/cgi-bin.conf && \
+    echo "<Directory \"/usr/lib/cgi-bin\">\n    AllowOverride None\n    Options +ExecCGI -MultiViews +SymLinksIfOwnerMatch\n    Require all granted\n</Directory>" >> /etc/apache2/conf-available/cgi-bin.conf && \
+    a2enconf cgi-bin
 
 # Exponer el puerto 80
 EXPOSE 80
 
-# Comando para iniciar Apache y MariaDB
-CMD service mysql start && apache2ctl -D FOREGROUND
+# Iniciar Apache en primer plano
+CMD ["apachectl", "-D", "FOREGROUND"]
