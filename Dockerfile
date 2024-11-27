@@ -1,42 +1,37 @@
-# Usar la imagen base de Bitnami Minideb
-FROM bitnami/minideb:latest
+# Usa una imagen base de Debian para instalar Apache, Perl y MariaDB
+FROM debian:latest
 
-# Establecer variables de entorno para evitar interacción en instalaciones
-ENV DEBIAN_FRONTEND=noninteractive
+# Actualiza e instala los paquetes necesarios
+RUN apt-get update && \
+    apt-get install -y apache2 libapache2-mod-perl2 perl mariadb-server dos2unix \
+    libdbi-perl libdbd-mysql-perl vim && \
+    apt-get clean
 
-# Actualizar paquetes e instalar dependencias necesarias
-RUN apt-get update && apt-get install -y \
-    apache2 \
-    libapache2-mod-perl2 \
-    perl \
-    libdbi-perl \
-    libdbd-mysql-perl \
-    curl \
-    && apt-get clean
+# Habilita el módulo CGI de Apache
+RUN a2dismod mpm_event mpm_worker cgid && \
+    a2enmod mpm_prefork cgi
 
-# Crear los directorios necesarios
-RUN mkdir -p /usr/lib/cgi-bin /var/www/html
-
-# Copiar los scripts CGI al directorio de CGI
+# Copia los scripts Perl
+RUN mkdir -p /usr/lib/cgi-bin/
 COPY cgi-bin/ /usr/lib/cgi-bin/
 
-# Dar permisos de ejecución a los scripts CGI
-RUN chmod +x /usr/lib/cgi-bin/*.pl
+# Crear directorio para HTML
+RUN mkdir -p /var/www/html
+RUN chmod -R 755 /var/www/html
 
-# Copiar los archivos HTML y CSS al directorio raíz de Apache
-COPY index.html /var/www/html/
-COPY styles.css /var/www/html/
+# Asegurar permisos correctos para los scripts CGI
+RUN chmod 755 /usr/lib/cgi-bin/*.pl && \
+    chown -R www-data:www-data /usr/lib/cgi-bin/ && \
+    dos2unix /usr/lib/cgi-bin/*.pl
 
-# Configurar Apache para habilitar CGI
-RUN a2enmod cgi
+# Copia todos los archivos del proyecto al directorio de Apache
+COPY . /var/www/html/
 
-# Configurar el directorio de CGI en Apache
-RUN echo "ScriptAlias /cgi-bin/ /usr/lib/cgi-bin/" > /etc/apache2/conf-available/cgi-bin.conf && \
-    echo "<Directory \"/usr/lib/cgi-bin\">\n    AllowOverride None\n    Options +ExecCGI -MultiViews +SymLinksIfOwnerMatch\n    Require all granted\n</Directory>" >> /etc/apache2/conf-available/cgi-bin.conf && \
-    a2enconf cgi-bin
+# Copia el archivo de configuración de Apache
+COPY 000-default.conf /etc/apache2/sites-available/000-default.conf
 
 # Exponer el puerto 80
 EXPOSE 80
 
-# Comando para iniciar Apache en primer plano
-CMD ["apachectl", "-D", "FOREGROUND"]
+# Comando para iniciar MariaDB y Apache en formato JSON (exec)
+CMD ["bash", "-c", "mysqld_safe & apache2ctl -D FOREGROUND"]
